@@ -1,18 +1,25 @@
 
 class Film:
-    def __init__(self, id, titre, nb_def, nb_matchs, vue):
-      self.id: int = id
-      self.titre: str = titre
-      self.nb_def: int = nb_def
-      self.nb_matchs: int = nb_matchs
-      self.vue: bool = vue
+	def __init__(self, id: int, titre: str):
+		self.id: int = id
+		self.titre: str = titre
+		self.image: str = "Image"
+		self.nb_vic: int = 0
+		self.nb_def: int = 0
+		self.vue: bool = True
+		self.list_vic: list[Film] = []
+		self.list_def: list[Film] = []
 
-    def affichage(self):
-        print("id:", self.id, " Titre:",self.titre," ",self.nb_def,"défaites pour",self.nb_matchs,"matchs et vue =",self.vue)
-
-    def score(self):
-      if self.vue == False:
-        return -1
-      else:
-        return self.nb_matchs - self.nb_def
+	def affichage(self):
+		if self.nb_def == 0 and self.nb_vic == 0:
+			print("id:", self.id, " Titre:", self.titre)
+		else:
+			print("id:", self.id, " Titre:", self.titre, " Nb vic:", self.nb_vic, "Nb def:", self.nb_def)
+	
+	def reset_data(self):
+		self.nb_vic: int = 0
+		self.nb_def: int = 0
+		self.vue: bool = True
+		self.list_vic: list[Film] = []
+		self.list_def: list[Film] = []
 

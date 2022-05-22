@@ -1,66 +1,59 @@
 from python_files.Match import *
 from python_files.Resultat import *
+from random import shuffle
 
 class Arbre:
-  def __init__(self, list_films: list[Film]):
-    self.arbre = []
-    self.arbre.append(list_films)
-    if len(self.arbre[0])%2!=0:
-      qualifie = self.arbre[0].pop()
-      self.arbre.append([qualifie])
-    else:
-      self.arbre.append([])
-    self.indice_film = 0
-    self.indice_round = 0
-    self.film1 = self.arbre[self.indice_round][self.indice_film]
-    self.film2 = self.arbre[self.indice_round][self.indice_film+1]
+    def __init__(self, list_films: list[Film], nb_films_fin_max: int, isBot: bool):
+        self.arbre: list[list[Film]] = []
+        self.arbre.append(list_films)
+        self.nb_films_fin_max: int = nb_films_fin_max
+        self.isBot: bool = isBot
 
-  def next_match(self):
-    if self.fini() == False:
-      if self.indice_film+1 < len(self.arbre[self.indice_round]):
-        self.film1 = self.arbre[self.indice_round][self.indice_film]
-        self.film2 = self.arbre[self.indice_round][self.indice_film+1]
-      else:
-        self.indice_film = 0
-        self.indice_round += 1
-        if len(self.arbre[self.indice_round])%2!=0:
-          qualifie = self.arbre[self.indice_round].pop()
-          self.arbre.append([qualifie])
+        self.id_film: int = 0
+        self.id_tour: int = 0
+
+        self.nb_match: int = 0
+
+        self.melange_et_qualifie_film_si_nombre_impaire()
+
+    def is_fini(self):
+        return (self.id_film == 0) and (len(self.arbre[self.id_tour]) <= self.nb_films_fin_max)
+
+    def melange_et_qualifie_film_si_nombre_impaire(self):
+        shuffle(self.arbre[self.id_tour])
+        self.arbre.append([])
+        if len(self.arbre[self.id_tour])%2==1 and not(self.is_fini()):
+            self.ajout_film_tour_suivant(len(self.arbre[self.id_tour])-1)
+
+    def prochain_match(self):
+        if ((self.id_film + 3) < len(self.arbre[self.id_tour])):
+            self.id_film += 2
         else:
-          self.arbre.append([])
-        self.film1 = self.arbre[self.indice_round][self.indice_film]
-        self.film2 = self.arbre[self.indice_round][self.indice_film+1]
-  
-  def match_bot(self):
-    if not(self.fini()):
-      
-      val = match_film_bot(self.film1, self.film2)
-      self.resolution_match(Resultat(val))
-      self.next_match()
+            self.id_film = 0
+            self.id_tour += 1
+            self.melange_et_qualifie_film_si_nombre_impaire()
 
-  def fini(self) -> bool:
-    return len(self.arbre[self.indice_round]) == 1
+    def ajout_film_tour_suivant(self, id_film: int):
+        self.arbre[self.id_tour+1].append(self.arbre[self.id_tour][id_film])
 
-  def resolution_match(self, resultat):
-    indice_film = -1
-    if resultat == Resultat.VICTOIRE or resultat == Resultat.GRANDE_DEFAITE or resultat == Resultat.PAS_VUE1:
-      indice_film = self.indice_film
-    elif resultat == Resultat.DEFAITE or resultat == Resultat.GRANDE_DEFAITE or resultat == Resultat.PAS_VUE2:
-      indice_film = self.indice_film+1
-    else:
-      print("Mauvais choix")
+    def joue_match(self):
+        film1 = self.arbre[self.id_tour][self.id_film]
+        film2 = self.arbre[self.id_tour][self.id_film+1]
+        resultat: Resultat = Match(film1, film2, self.isBot).joue_match()
 
-    if indice_film!=-1:
-      qualifie = self.arbre[self.indice_round].pop(indice_film)
-      self.arbre[self.indice_round+1].append(qualifie)
-      self.indice_film += 2
-      self.next_match()
+        if resultat == Resultat.VICTOIRE:
+            self.ajout_film_tour_suivant(self.id_film)
+        else:
+            self.ajout_film_tour_suivant(self.id_film+1)
+    
+    def joue_arbre(self):
+        while not(self.is_fini()):
+            self.nb_match += 1
+            self.joue_match()
+            self.prochain_match()
 
-  def classement(self):
-    return self.arbre
-
-  def affichage(self):
-    for i in range(len(self.arbre)):
-      print("TIER n°",i+1," -----------------")
-      for y in self.arbre[i]:
-        y.affichage()
+    def affichage(self):
+        for i in range(len(self.arbre)):
+            print("TIER n°",i+1," -----------------")
+            for film in self.arbre[i]:
+                film.affichage()
