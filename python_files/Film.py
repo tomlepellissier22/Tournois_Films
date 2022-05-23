@@ -6,20 +6,14 @@ class Film:
 		self.image: str = "Image"
 		self.nb_vic: int = 0
 		self.nb_def: int = 0
-		self.vue: bool = True
-		self.list_vic: list[Film] = []
-		self.list_def: list[Film] = []
 
 	def affichage(self):
 		if self.nb_def == 0 and self.nb_vic == 0:
-			print("id:", self.id, " Titre:", self.titre)
+			print("id: %2d, Titre: %s" %(self.id, self.titre))
 		else:
-			print("id:", self.id, " Titre:", self.titre, " Nb vic:", self.nb_vic, "Nb def:", self.nb_def)
+			print("id: %2d, Nb vic: %2d, Nb def: %2d, Titre: %s" %(self.id, self.nb_vic, self.nb_def, self.titre))
 	
 	def reset_data(self):
 		self.nb_vic: int = 0
 		self.nb_def: int = 0
-		self.vue: bool = True
-		self.list_vic: list[Film] = []
-		self.list_def: list[Film] = []
 

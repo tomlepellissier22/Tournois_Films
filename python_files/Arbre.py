@@ -37,6 +37,8 @@ class Arbre:
         self.arbre[self.id_tour+1].append(self.arbre[self.id_tour][id_film])
 
     def joue_match(self):
+        self.nb_match += 1
+        
         film1 = self.arbre[self.id_tour][self.id_film]
         film2 = self.arbre[self.id_tour][self.id_film+1]
         resultat: Resultat = Match(film1, film2, self.isBot).joue_match()
@@ -48,7 +50,6 @@ class Arbre:
     
     def joue_arbre(self):
         while not(self.is_fini()):
-            self.nb_match += 1
             self.joue_match()
             self.prochain_match()
 

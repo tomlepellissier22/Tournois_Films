@@ -1,6 +1,8 @@
 from python_files.Constantes import *
+from python_files.Elimination_By_Def import Elimination_by_Def
 from python_files.Film import Film
 from python_files.Arbre import Arbre
+from python_files.Groupe import Groupe
 
 
 class Tournois_Film:
@@ -15,7 +17,7 @@ class Tournois_Film:
 
     def genere_list_films(self) -> list[Film]:
         print("Grande liste ou petite liste")
-        return [Film(i, "Film n°" + str(i)) for i in range(nb_films)]
+        return [Film(i+1, "Film n°" + str(i+1)) for i in range(nb_films)]
     
     def enleve_films_pas_vue(self):
         index = 0
@@ -65,15 +67,28 @@ class Tournois_Film:
                 else:
                     index += 1
     
+    def reset_all_data(list_films: list[Film]):
+        for film in list_films:
+            film.reset_data()
+    
     def start_tournois(self):
 
         self.List_Films_En_Jeux = self.genere_list_films()
 
         self.enleve_films_pas_vue_et_nul()
 
-        arbre: Arbre = Arbre(self.List_Films_En_Jeux, 1, self.isBot)
-        self.nb_match += arbre.nb_match
+        arbre: Arbre = Arbre(self.List_Films_En_Jeux.copy(), 1, self.isBot)
         arbre.joue_arbre()
-        arbre.affichage()
+        #arbre.affichage()
 
-        print("Nb match total :", self.nb_match)
+        groupe: Groupe = Groupe(self.List_Films_En_Jeux.copy(), 5, True)
+        groupe.joue_groupe()
+        groupe.affichage()
+
+        elimination: Elimination_by_Def = Elimination_by_Def(self.List_Films_En_Jeux.copy(), 10, True)
+        elimination.joue_elimination()
+        #elimination.affichage()
+
+        print("Nb match total Arbre :", arbre.nb_match)
+        print("Nb match total Groupe :", groupe.nb_match)
+        print("Nb match total Elimination :", elimination.nb_match)
