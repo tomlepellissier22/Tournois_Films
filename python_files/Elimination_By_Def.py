@@ -1,6 +1,6 @@
-import imp
-from python_files.Match import *
-from python_files.Resultat import *
+from python_files.Match import Match
+from python_files.Film import Film
+from python_files.Resultat import Resultat
 from python_files.Constantes import NB_DEF_MAX
 from random import shuffle
 
@@ -8,6 +8,7 @@ class Elimination_by_Def:
     def __init__(self, list_films: list[Film], nb_films_fin_max: int, isBot: bool):
         self.list_etape_elimination: list[list[Film]] = [list_films]
         self.list_etape_elimination.append([])
+        self.tier_list: list[list[Film]] = [[]]
 
         self.nb_films_fin_max: int = nb_films_fin_max
         self.isBot: bool = isBot
@@ -94,12 +95,24 @@ class Elimination_by_Def:
             else:
                 self.list_etape_elimination[self.id_tour+1].append(film)
 
-    def joue_elimination(self):
+    def joue(self):
         while not(self.is_fini()):
             self.prochain_match()
+        
+        self.genere_tier_list()
+    
+    def genere_tier_list(self):
+        self.tier_list = self.list_etape_elimination.copy()
+
+        while True:
+            try:
+                self.tier_list.remove([])
+            except ValueError:
+                break
 
     def affichage(self):
-        for i in range(len(self.list_etape_elimination)):
-            print("TIER n°",i+1," -----------------")
+        taille = len(self.list_etape_elimination)
+        for i in range(taille):
+            print("TIER n°",taille-i," -----------------")
             for film in self.list_etape_elimination[i]:
                 film.affichage()

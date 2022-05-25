@@ -1,5 +1,6 @@
 from python_files.Film import Film
 from python_files.Resultat import Resultat
+from python_files.Input_fonction import Input_fonction
 
 class Match:
     def __init__(self, film1: Film, film2: Film, isBot: bool) -> None:
@@ -15,16 +16,14 @@ class Match:
     
     def match_joueur(self) -> Resultat:
 
-        while(True):
-            self.film1.affichage()
-            print("contre")
-            self.film2.affichage()
-            print()
+        list_texte: list[str] = []
+        list_texte.append("Match")
+        list_texte.append(self.film1.toString())
+        list_texte.append("contre")
+        list_texte.append(self.film2.toString())
+        list_texte.append("Que choisis-tu ? (1=>Victoire, 2=>Défaite)")
 
-            print("Que choisis-tu ? (1=>Victoire, 2=>Défaite)")
-            val = input()
-            if (val!="" and int(val)>0 and int(val)<=2):
-                return Resultat(val)
+        return Resultat(Input_fonction(list_texte, 1, 2))
 
     def match_bot(self) -> Resultat:
             

@@ -1,12 +1,14 @@
-from python_files.Match import *
-from python_files.Resultat import *
+from python_files.Match import Match
+from python_files.Film import Film
+from python_files.Resultat import Resultat
 from random import shuffle
 
 class Groupe:
-    def __init__(self, list_films: list[Film], nb_equipes_par_groupe: int, isBot: bool, nb_match_par_film: int = -1):
+    def __init__(self, list_films: list[Film], nb_films_fin: int, isBot: bool, nb_equipes_par_groupe: int, nb_match_par_film: int = -1):
         self.nb_equipe_par_groupe: int = 4 if (nb_equipes_par_groupe <= 4) else nb_equipes_par_groupe
         self.nb_groupes: int = len(list_films)//nb_equipes_par_groupe if ((len(list_films)//nb_equipes_par_groupe)*nb_equipes_par_groupe == len(list_films)) else (len(list_films)//nb_equipes_par_groupe)+1
 
+        self.tier_list: list[list[Film]] = [[]]
         self.list_groupe: list[list[Film]] = [[] for _ in range(self.nb_groupes)]
         self.isBot: bool = isBot
 
@@ -15,6 +17,7 @@ class Groupe:
         self.num_match: int = 0
 
         self.nb_match: int = 0
+        self.nb_films_fin: int = nb_films_fin
 
         self.initialisation_groupe(list_films)
 
@@ -92,18 +95,46 @@ class Groupe:
     def is_fini(self):
         return self.nb_match_par_film <= self.id_tour
 
-    def joue_groupe(self):
+    def joue(self):
         while not(self.is_fini()):
             self.joue_match()
             self.prochain_match()
         
-        self.genere_classement()
+        self.trie_groupe()
+        self.genere_tier_list()
     
-    def genere_classement(self):
-        return True
+    def trie_groupe(self):
+        for groupe in self.list_groupe:
+            groupe.sort(key=lambda film: film.nb_vic, reverse=True)
 
-    def affichage(self):
+    def genere_tier_list(self):
+        list_groupe_copy = self.list_groupe.copy()
+        nb_equipe: int = len(list_groupe_copy[0])
+        num_tier_list: int = 0
+        while self.nb_groupes * nb_equipe > self.nb_films_fin:
+            for groupe in list_groupe_copy:
+                if len(groupe) == nb_equipe:
+                    self.tier_list[num_tier_list].append(groupe.pop())
+            
+            num_tier_list += 1
+            self.tier_list.append([])
+            nb_equipe= len(list_groupe_copy[0])
+        
+        if len(list_groupe_copy[0]) == 0:
+            self.tier_list.remove([])
+        else:
+            for groupe in list_groupe_copy:
+                self.tier_list[num_tier_list] += groupe
+
+    def affichage_groupe(self):
         for i in range(len(self.list_groupe)):
             print(f"GROUPE n°{i+1} -----------------")
             for film in self.list_groupe[i]:
+                film.affichage()
+
+    def affichage(self):
+        taille = len(self.tier_list)
+        for i in range(taille):
+            print(f"TIER n°{taille-i} -----------------")
+            for film in self.tier_list[i]:
                 film.affichage()

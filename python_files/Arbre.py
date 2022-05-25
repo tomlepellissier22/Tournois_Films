@@ -1,10 +1,12 @@
-from python_files.Match import *
-from python_files.Resultat import *
+from python_files.Match import Match
+from python_files.Film import Film
+from python_files.Resultat import Resultat
 from random import shuffle
 
 class Arbre:
     def __init__(self, list_films: list[Film], nb_films_fin_max: int, isBot: bool):
         self.arbre: list[list[Film]] = []
+        self.tier_list: list[list[Film]] = []
         self.arbre.append(list_films)
         self.nb_films_fin_max: int = nb_films_fin_max
         self.isBot: bool = isBot
@@ -48,13 +50,27 @@ class Arbre:
         else:
             self.ajout_film_tour_suivant(self.id_film+1)
     
-    def joue_arbre(self):
+    def joue(self):
         while not(self.is_fini()):
             self.joue_match()
             self.prochain_match()
+        
+        self.clean_arbre()
+    
+    def clean_arbre(self):
+        self.tier_list = self.arbre.copy()
+        taille_arbre = len(self.tier_list)
+        for index in range(taille_arbre-1):
+            for film in self.tier_list[taille_arbre-index-1]:
+                for tier in range(taille_arbre-index-1):
+                    self.tier_list[tier].remove(film)
+        
+        self.tier_list.remove([])
+
 
     def affichage(self):
-        for i in range(len(self.arbre)):
-            print("TIER n°",i+1," -----------------")
+        taille = len(self.arbre)
+        for i in range(taille):
+            print("TIER n°",taille-i," -----------------")
             for film in self.arbre[i]:
                 film.affichage()
