@@ -1,19 +1,24 @@
 from random import shuffle
 from python_files.Constantes import *
+from python_files.Display_fonction import choix_base_de_donnees, choix_question, display_one_films, display_tier_list
 from python_files.Elimination_By_Def import Elimination_by_Def
 from python_files.Film import Film
 from python_files.Arbre import Arbre
-from python_files.Groupe import Groupe
-from python_files.Input_fonction import Input_fonction
+from python_files.Genere_Base_De_Donnee import genere_base_de_donne
+from python_files.Resultat import Resultat
+from python_files.Sauvegarde import charge_sauvegarde, charge_tier_liste, sauvegarde, sauvegarde_tier_liste, sauvegarde_tier_liste_humain
 
 
 class Tournois_Film:
 
     def __init__(self) -> None:
-        self.List_Films_En_Jeux: list[Film] = []
+        self.List_Films_Depart: list[Film] = []
+        self.List_Films_Restants: list[Film] = []
         self.List_Films_Pas_Vue: list[Film] = []
-        self.List_Films_Elimines: list[list[Film]] = []
-        self.isBot: bool = True #if Input_fonction(["Es-tu un bot ? (1 => Oui, 2 => Non)"], 1, 2) == 1 else False
+        self.List_Films_Elimines: list[list[Film]] = [[]]
+        self.tier_list = [[]]
+        self.isBot: bool = ISBOT
+        self.isSauvegarde = False
 
         self.nb_match = 0
 
@@ -23,114 +28,199 @@ class Tournois_Film:
     def choix_base_de_donnees(self):
 
         if self.isBot == False:
-            list_texte: list[str] = []
-            list_texte.append("Choisis la base de données: 1=>Grande (1000 Films), 2=>Moyenne (500 Films), 3=>Petite (200 Films)")
-
-            val = Input_fonction(list_texte, 1, 3)
+            val = choix_base_de_donnees()
         else:
             val = 1
 
         if val == 1:
-            self.List_Films_En_Jeux = self.genere_list_films(100)
+            self.List_Films_Depart = genere_base_de_donne(
+                ID_LISTE_TOUS_LES_FILMS)
         elif val == 2:
-            self.List_Films_En_Jeux = self.genere_list_films(50)
+            self.List_Films_Depart = genere_base_de_donne(
+                ID_LISTE_MEILLEUR_FILMS_GRAND)
         else:
-            self.List_Films_En_Jeux = self.genere_list_films(10)
-        
-        shuffle(self.List_Films_En_Jeux)
-    
+            self.List_Films_Depart = genere_base_de_donne(
+                ID_LISTE_MEILLEUR_FILMS_PETIT)
+
+        shuffle(self.List_Films_Depart)
+
     def enleve_films_pas_vue(self):
         index = 0
-        while index < len(self.List_Films_En_Jeux):
+        while index < len(self.List_Films_Depart):
+            self.nb_match += 1
 
             if not(self.isBot):
-                list_texte: list[str] = []
-                list_texte.append("As-tu vue le film suivant ? (1=>Oui, 2=>Non)")
-                list_texte.append(self.List_Films_En_Jeux[index].toString())
+                val = display_one_films(self.List_Films_Depart[index], False)
 
-                val = Input_fonction(list_texte, 1, 3)
-
-                if val == 1:
-                    index += 1
-                if val == 2:
-                    self.List_Films_Pas_Vue.append(self.List_Films_En_Jeux.pop(index))
-
+                if val == Resultat.BIEN:
+                    self.List_Films_Restants.append(
+                        self.List_Films_Depart.pop(index))
+                if val == Resultat.PAS_VUE:
+                    self.List_Films_Pas_Vue.append(
+                        self.List_Films_Depart.pop(index))
+                if val == Resultat.SAUVEGARDE:
+                    self.sauvegarde()
+                    self.isSauvegarde = True
+                if val == Resultat.FIN:
+                    self.isSauvegarde = True
             else:
-                if self.List_Films_En_Jeux[index].id > nb_films*(1-(pourcentage_films_pas_vue)/100):
-                    self.List_Films_Pas_Vue.append(self.List_Films_En_Jeux.pop(index))
+                if self.List_Films_Depart[index].id > nb_films*(1-(pourcentage_films_pas_vue)/100):
+                    self.List_Films_Pas_Vue.append(
+                        self.List_Films_Depart.pop(index))
                 else:
-                    index += 1
-    
+                    self.List_Films_Restants.append(
+                        self.List_Films_Depart.pop(index))
+
     def enleve_films_pas_vue_et_nul(self):
         index = 0
-        while index < len(self.List_Films_En_Jeux):
+        while index < len(self.List_Films_Depart) and self.isSauvegarde == False:
+            self.nb_match += 1
 
             if not(self.isBot):
-                list_texte: list[str] = []
-                list_texte.append("Le film suivant fait-il partie de ton top meilleurs film ou pas vue ? (1=>Oui, 2=>Non, 3=>Pas Vue)")
-                list_texte.append(self.List_Films_En_Jeux[index].toString())
+                val = display_one_films(self.List_Films_Depart[index], True)
 
-                val = Input_fonction(list_texte, 1, 3)
-
-                if val == 1:
-                    index += 1
-                if val == 2:
-                    self.List_Films_Elimines[0].append(self.List_Films_En_Jeux.pop(index))
-                if val == 3:
-                    self.List_Films_Pas_Vue.append(self.List_Films_En_Jeux.pop(index))
-
+                if val == Resultat.BIEN:
+                    self.List_Films_Restants.append(
+                        self.List_Films_Depart.pop(index))
+                if val == Resultat.PAS_VUE:
+                    self.List_Films_Pas_Vue.append(
+                        self.List_Films_Depart.pop(index))
+                if val == Resultat.NUL:
+                    self.List_Films_Elimines[0].append(
+                        self.List_Films_Depart.pop(index))
+                if val == Resultat.SAUVEGARDE:
+                    self.sauvegarde()
+                    self.isSauvegarde = True
+                if val == Resultat.FIN:
+                    self.isSauvegarde = True
             else:
-                if self.List_Films_En_Jeux[index].id > nb_films*(1-(pourcentage_films_pas_vue)/100):
-                    self.List_Films_Pas_Vue.append(self.List_Films_En_Jeux.pop(index))
-                elif self.List_Films_En_Jeux[index].id > nb_films*(1-(100-pourcentage_meilleurs_films)/100):
-                    self.List_Films_Elimines[0].append(self.List_Films_En_Jeux.pop(index))
+                if self.List_Films_Depart[index].id > nb_films*(1-(pourcentage_films_pas_vue)/100):
+                    self.List_Films_Pas_Vue.append(
+                        self.List_Films_Depart.pop(index))
+                elif self.List_Films_Depart[index].id > nb_films*(1-(100-pourcentage_meilleurs_films)/100):
+                    self.List_Films_Elimines[0].append(
+                        self.List_Films_Depart.pop(index))
                 else:
-                    index += 1
-    
+                    self.List_Films_Restants.append(
+                        self.List_Films_Depart.pop(index))
+
     def reset_all_data(list_films: list[Film]):
         for film in list_films:
             film.reset_data()
-    
+
     def affichage(self):
         print("Liste films pas vues")
         for film in self.List_Films_Pas_Vue:
             film.affichage()
-        
+
         print("Liste films éliminés")
         taille = len(self.List_Films_Elimines)
         for i in range(taille):
-            print("TIER n°",taille-i," -----------------")
+            print("TIER n°", taille-i, " -----------------")
             for film in self.List_Films_Elimines[i]:
                 film.affichage()
 
         print("Liste films en jeux")
-        for film in self.List_Films_En_Jeux:
+        for film in self.List_Films_Depart:
             film.affichage()
-    
-    def lance_type(self, type, nb_films_fin: int, nb_equipes_par_groupe: int = 0, nb_match_par_films: int = -1):
+
+        print("Liste films Restants")
+        for film in self.List_Films_Restants:
+            film.affichage()
+
+    def lance_type(self, type, nb_films_fin: int, isSauvegarde: bool, nb_equipes_par_groupe: int = 0, nb_match_par_films: int = -1):
         if nb_equipes_par_groupe == 0:
-            list_type: type = type(self.List_Films_En_Jeux.copy(), nb_films_fin, self.isBot)
+            list_type: type = type(self.List_Films_Restants.copy(
+            ), nb_films_fin, self.isBot, isSauvegarde)
         else:
-            list_type: type = type(self.List_Films_En_Jeux.copy(), nb_films_fin, self.isBot, nb_equipes_par_groupe, nb_match_par_films)
-        list_type.joue()
+            list_type: type = type(self.List_Films_Restants.copy(
+            ), nb_films_fin, self.isBot, isSauvegarde, nb_equipes_par_groupe, nb_match_par_films)
+        self.isSauvegarde = list_type.joue()
         self.nb_match += list_type.nb_match
-        self.List_Films_Elimines += list_type.tier_list[:-1]
-        self.List_Films_En_Jeux = list_type.tier_list[-1]
+
+        if self.isSauvegarde == False:
+            self.List_Films_Elimines += list_type.tier_list[:-1]
+            self.List_Films_Restants = list_type.tier_list[-1]
+
+    def sauvegarde(self):
+        Liste_Info_General = [self.List_Films_Restants, self.List_Films_Pas_Vue,
+                              self.List_Films_Elimines, self.List_Films_Depart]
+        sauvegarde(Liste_Info_General)
+
+    def display_tier_liste(self):
+        self.tier_list: list[list[Film]] = [self.List_Films_Pas_Vue.copy] + self.List_Films_Elimines.copy() + [self.List_Films_Restants.copy()]
+
+        sauvegarde_tier_liste(self.tier_list)
+        sauvegarde_tier_liste_humain(self.tier_list)
+
+        print("Tier Liste")
+        taille = len(self.tier_list)
+        for i in range(taille):
+            print("TIER n°", taille-i, " -----------------")
+            for film in self.tier_list[i]:
+                film.affichage()
+
+    def charger_sauvegarde(self):
+        val = choix_question("Veux-tu charger la sauvegarde ?")
+
+        if val == 1:
+            self.List_Films_Restants, self.List_Films_Pas_Vue, self.List_Films_Elimines, self.List_Films_Depart = charge_sauvegarde()
+
+        return val == 1
+    
+    def charger_and_display_tier_list(self):
+        val = choix_question("Veux-tu afficher la tier_list sauvegardé ?")
+
+        if val == 1:
+            self.tier_list = charge_tier_liste()
+
+        return val == 1
 
     def start_tournois(self):
 
-        self.choix_base_de_donnees()
+        afficher_tier_list_sauvegarde = False
+        try:
+            fichier = open("Sauvegarde/Tier_liste", "rb")
+            fichier.close()
+            afficher_tier_list_sauvegarde = self.charger_and_display_tier_list()
+        except:
+            print("Pas de tier_list existante")
 
-        self.enleve_films_pas_vue_et_nul()
+        if afficher_tier_list_sauvegarde == False:
+            sauvegarde_existante = False
+            try:
+                fichier = open("Sauvegarde/Liste_info_General", 'rb')
+                fichier.close()
+                sauvegarde_existante = self.charger_sauvegarde()
+            except:
+                print("Pas de sauvegarde existante")
 
-        #self.lance_type(Groupe, 100, 10)
+            if sauvegarde_existante:
+                if len(self.List_Films_Depart) > 0:
+                    sauvegarde_existante = False
+            else:
+                self.choix_base_de_donnees()
 
-        self.lance_type(Elimination_by_Def, 10)
+            if sauvegarde_existante == False:
+                enleve_films = choix_question(
+                    "Veux-tu enlever les films que tu n'as pas vue de la base de donnée ?")
+                if enleve_films == 1:
+                    self.enleve_films_pas_vue_et_nul()
+                else:
+                    self.List_Films_Restants = self.List_Films_Depart.copy()
+                    self.List_Films_Depart = []
 
-        self.lance_type(Arbre, 1)
-        self.affichage()
+            if self.isSauvegarde == False and len(self.List_Films_Restants) > 10:
+                print("Debut Elimination")
+                self.lance_type(Elimination_by_Def, 10, sauvegarde_existante)
 
-        #print("Nb match total Arbre :", arbre.nb_match)
-        #print("Nb match total Groupe :", groupe.nb_match)
-        #print("Nb match total Elimination :", elimination.nb_match)
-        print("Nb match total :", self.nb_match)
+            if self.isSauvegarde == False and len(self.List_Films_Restants) > 1:
+                print("Debut Arbre")
+                self.lance_type(Arbre, 1, sauvegarde_existante)
+
+            if self.isSauvegarde:
+                self.sauvegarde()
+
+            print("Nb match total :", self.nb_match)
+
+        self.display_tier_liste()

@@ -4,7 +4,7 @@ from python_files.Resultat import Resultat
 from random import shuffle
 
 class Groupe:
-    def __init__(self, list_films: list[Film], nb_films_fin: int, isBot: bool, nb_equipes_par_groupe: int, nb_match_par_film: int = -1):
+    def __init__(self, list_films: list[Film], nb_films_fin: int, isBot: bool, isSauvegarde: bool, nb_equipes_par_groupe: int, nb_match_par_film: int = -1):
         self.nb_equipe_par_groupe: int = 4 if (nb_equipes_par_groupe <= 4) else nb_equipes_par_groupe
         self.nb_groupes: int = len(list_films)//nb_equipes_par_groupe if ((len(list_films)//nb_equipes_par_groupe)*nb_equipes_par_groupe == len(list_films)) else (len(list_films)//nb_equipes_par_groupe)+1
 
@@ -102,6 +102,8 @@ class Groupe:
         
         self.trie_groupe()
         self.genere_tier_list()
+
+        return False
     
     def trie_groupe(self):
         for groupe in self.list_groupe:

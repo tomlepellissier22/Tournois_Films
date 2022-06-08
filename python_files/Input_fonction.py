@@ -1,7 +1,4 @@
-from python_files.Resultat import Resultat
-
 def Input_fonction(list_texte: list[str], val_min: int, val_max: int):
-
     while (True):
         try:
             for texte in list_texte:

@@ -4,7 +4,7 @@ from python_files.Resultat import Resultat
 from random import shuffle
 
 class Arbre:
-    def __init__(self, list_films: list[Film], nb_films_fin_max: int, isBot: bool):
+    def __init__(self, list_films: list[Film], nb_films_fin_max: int, isBot: bool, isSauvegarde: bool):
         self.arbre: list[list[Film]] = []
         self.tier_list: list[list[Film]] = []
         self.arbre.append(list_films)
@@ -56,6 +56,7 @@ class Arbre:
             self.prochain_match()
         
         self.clean_arbre()
+        return False
     
     def clean_arbre(self):
         self.tier_list = self.arbre.copy()

@@ -8,6 +8,8 @@ class Resultat(Enum):
   EGALITE_DEFAITE = 5
   GRANDE_VICTOIRE = 6
   GRANDE_DEFAITE = 7
-  PAS_VUE1 = 8
-  PAS_VUE2 = 9
-  PAS_VUE_LES_DEUX = 10
+  PAS_VUE = 8
+  NUL = 9
+  BIEN = 10
+  SAUVEGARDE = 11
+  FIN = 12
