@@ -39,7 +39,7 @@ def sauvegarde_tier_liste_humain(Tier_liste: list[list[Film]]):
         print("TIER n°", taille-i, " -----------------")
         for film in Tier_liste[i]:
             fichier.write("id: "+str(film.id)+" Titre: "+str(film.titre) +
-                          " Titre original: "+str(film.titre_original))
+                          " Titre original: "+str(film.titre_original)+"\n")
     fichier.close()
 
 

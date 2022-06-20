@@ -1,6 +1,6 @@
 from random import shuffle
 from python_files.Constantes import *
-from python_files.Display_fonction import choix_base_de_donnees, choix_question, display_one_films, display_tier_list
+from python_files.Display_fonction import choix_base_de_donnees, choix_question, display_one_films
 from python_files.Elimination_By_Def import Elimination_by_Def
 from python_files.Film import Film
 from python_files.Arbre import Arbre
@@ -148,7 +148,13 @@ class Tournois_Film:
         sauvegarde(Liste_Info_General)
 
     def display_tier_liste(self):
-        self.tier_list: list[list[Film]] = [self.List_Films_Pas_Vue.copy] + self.List_Films_Elimines.copy() + [self.List_Films_Restants.copy()]
+        self.tier_list: list[list[Film]] = [self.List_Films_Pas_Vue.copy()] + self.List_Films_Elimines.copy() + [self.List_Films_Restants.copy()]
+
+        while True:
+            try:
+                self.tier_list.remove([])
+            except ValueError:
+                break
 
         sauvegarde_tier_liste(self.tier_list)
         sauvegarde_tier_liste_humain(self.tier_list)
@@ -183,6 +189,9 @@ class Tournois_Film:
             fichier = open("Sauvegarde/Tier_liste", "rb")
             fichier.close()
             afficher_tier_list_sauvegarde = self.charger_and_display_tier_list()
+
+            if afficher_tier_list_sauvegarde:
+                self.display_tier_liste()
         except:
             print("Pas de tier_list existante")
 
@@ -223,4 +232,4 @@ class Tournois_Film:
 
             print("Nb match total :", self.nb_match)
 
-        self.display_tier_liste()
+            self.display_tier_liste()

@@ -110,7 +110,6 @@ class Elimination_by_Def:
                 self.list_etape_elimination[self.id_tour+1].append(film)
 
     def joue(self):
-        print(self.isFini, self.isSauvegarde)
         if self.isSauvegarde:
             self.charge_sauvegarde()
             self.isSauvegarde = False
