@@ -10,6 +10,7 @@ class Arbre:
         self.arbre.append(list_films)
         self.nb_films_fin_max: int = nb_films_fin_max
         self.isBot: bool = isBot
+        self.isFini: bool = False
 
         self.id_film: int = 0
         self.id_tour: int = 0
@@ -19,7 +20,7 @@ class Arbre:
         self.melange_et_qualifie_film_si_nombre_impaire()
 
     def is_fini(self):
-        return (self.id_film == 0) and (len(self.arbre[self.id_tour]) <= self.nb_films_fin_max)
+        return ((self.id_film == 0) and (len(self.arbre[self.id_tour]) <= self.nb_films_fin_max)) or self.isFini
 
     def melange_et_qualifie_film_si_nombre_impaire(self):
         shuffle(self.arbre[self.id_tour])
@@ -45,7 +46,9 @@ class Arbre:
         film2 = self.arbre[self.id_tour][self.id_film+1]
         resultat: Resultat = Match(film1, film2, self.isBot).joue_match()
 
-        if resultat == Resultat.VICTOIRE:
+        if resultat == Resultat.FIN:
+            self.isFini = True
+        elif resultat == Resultat.VICTOIRE:
             self.ajout_film_tour_suivant(self.id_film)
         else:
             self.ajout_film_tour_suivant(self.id_film+1)

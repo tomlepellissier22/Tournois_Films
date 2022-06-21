@@ -2,10 +2,10 @@ from io import BytesIO
 import requests
 import PIL.Image
 
-API_KEY = "c9e1031f1e8ee4a55b0806fd15fedb8a"
+from python_files.Constantes import API_KEY
 
 def getFilmInfo(idFilm: int):
-    url = "https://api.themoviedb.org/3/movie/" + str(idFilm) + "?api_key=" + API_KEY
+    url = "https://api.themoviedb.org/3/movie/" + str(idFilm) + "?api_key=" + API_KEY + "&language=fr-FR"
     
     return requests.get(url).json()
 
@@ -19,11 +19,11 @@ def getFilmImage(imageUrl: str, taille: int):
     return PIL.Image.open(BytesIO(result.content))
 
 def getMostPopularFilms(pageId: int):
-    url = "https://api.themoviedb.org/3/discover/movie?api_key="+ API_KEY +"&sort_by=vote_count.desc&include_adult=true&include_video=false&page="+str(pageId)+"&with_watch_monetization_types=flatrate"
+    url = "https://api.themoviedb.org/3/discover/movie?api_key="+ API_KEY +"&sort_by=vote_count.desc&include_adult=true&include_video=false&page="+str(pageId)+"&with_watch_monetization_types=flatrate&language=fr-FR"
     return requests.get(url).json()
 
 def getMoviesFromList(listId: int):
-    url = "https://api.themoviedb.org/3/list/"+str(listId)+"?api_key="+ API_KEY +"&language=fr-FR"
+    url = "https://api.themoviedb.org/3/list/"+str(listId)+"?api_key="+ API_KEY + "&language=fr-FR"
     return requests.get(url).json()
 
 def getRequestToken():

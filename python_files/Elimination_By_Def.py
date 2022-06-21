@@ -120,7 +120,7 @@ class Elimination_by_Def:
         if self.isSauvegarde:
             self.sauvegarde()
         else:
-            if not(self.isFini):
+            if (self.isFini == False):
                 self.genere_tier_list()
 
         return self.isSauvegarde

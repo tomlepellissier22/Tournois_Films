@@ -219,17 +219,17 @@ class Tournois_Film:
                     self.List_Films_Restants = self.List_Films_Depart.copy()
                     self.List_Films_Depart = []
 
-            if self.isSauvegarde == False and len(self.List_Films_Restants) > 10:
+            if self.isSauvegarde == False and len(self.List_Films_Restants) > NB_FILMS_AFTER_ELIMINATION:
                 print("Debut Elimination")
-                self.lance_type(Elimination_by_Def, 10, sauvegarde_existante)
+                self.lance_type(Elimination_by_Def, NB_FILMS_AFTER_ELIMINATION, sauvegarde_existante)
 
-            if self.isSauvegarde == False and len(self.List_Films_Restants) > 1:
+            if self.isSauvegarde == False and len(self.List_Films_Restants) > NB_FILMS_AFTER_ARBRE :#and len(self.List_Films_Restants) <= NB_FILMS_AFTER_ELIMINATION:
                 print("Debut Arbre")
-                self.lance_type(Arbre, 1, sauvegarde_existante)
+                self.lance_type(Arbre, NB_FILMS_AFTER_ARBRE, sauvegarde_existante)
 
             if self.isSauvegarde:
                 self.sauvegarde()
 
-            print("Nb match total :", self.nb_match)
-
-            self.display_tier_liste()
+            if self.isSauvegarde == False and len(self.List_Films_Restants) > 0:
+                print("Nb match total :", self.nb_match)
+                self.display_tier_liste()

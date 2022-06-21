@@ -33,10 +33,10 @@ def charge_tier_liste():
 
 def sauvegarde_tier_liste_humain(Tier_liste: list[list[Film]]):
     fichier = open("Sauvegarde/Tier_liste_Humain", 'w')
-    print("Tier Liste")
+    fichier.write("Tier Liste\n")
     taille = len(Tier_liste)
     for i in range(taille):
-        print("TIER n°", taille-i, " -----------------")
+        fichier.write("TIER n°", taille-i, " --------------------------------\n")
         for film in Tier_liste[i]:
             fichier.write("id: "+str(film.id)+" Titre: "+str(film.titre) +
                           " Titre original: "+str(film.titre_original)+"\n")
