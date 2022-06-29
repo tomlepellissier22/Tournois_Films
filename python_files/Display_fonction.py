@@ -3,7 +3,7 @@ from tkinter import *
 import PIL.ImageTk
 from python_files.Constantes import TAILLE_GRANDE_IMAGE, TAILLE_PETIT_IMAGE
 from python_files.Film import Film
-from python_files.Request import getFilmImage
+from python_files.Request import getFilmImage, getFilmInfo
 from python_files.Resultat import Resultat
 
 """{

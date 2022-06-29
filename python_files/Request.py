@@ -22,9 +22,38 @@ def getMostPopularFilms(pageId: int):
     url = "https://api.themoviedb.org/3/discover/movie?api_key="+ API_KEY +"&sort_by=vote_count.desc&include_adult=true&include_video=false&page="+str(pageId)+"&with_watch_monetization_types=flatrate&language=fr-FR"
     return requests.get(url).json()
 
-def getMoviesFromList(listId: int):
-    url = "https://api.themoviedb.org/3/list/"+str(listId)+"?api_key="+ API_KEY + "&language=fr-FR"
+def getFirst500MoviesFromList(listeId: int):
+    url = "https://api.themoviedb.org/3/list/"+str(listeId)+"?api_key="+ API_KEY + "&language=fr-FR"
+    result = requests.get(url).json()
+    return result["items"]
+
+def getAllMoviesFromList(listeId: int):
+    liste_movie = getFirst500MoviesFromList(listeId)
+    page = 26
+    liste = getFilmFromListWithPage(listeId, page)
+    while len(liste["results"]) > 0:
+        liste_movie += liste["results"]
+        page += 1
+        liste = getFilmFromListWithPage(listeId, page)
+    
+    return liste_movie
+
+def getFilmFromListWithPage(listeId: int, page: int):
+    url = "https://api.themoviedb.org/4/list/"+ str(listeId) +"?page="+ str(page) +"&api_key="+ API_KEY + "&sort_by=title.asc&language=fr"
     return requests.get(url).json()
+
+def getAllIdFromList(listeId: int) -> list[int]:
+    url = "https://api.themoviedb.org/4/list/"+ str(listeId) +"?page=1&api_key="+ API_KEY + "&language=fr-FR"
+    result = requests.get(url).json()
+    liste = []
+    for key in result["comments"]:
+        liste.append(int(key[6:]))
+    return liste
+
+def getNbFilmsFromList(listeId: int) -> int:
+    url = "https://api.themoviedb.org/4/list/"+ str(listeId) +"?page=1&api_key="+ API_KEY + "&language=fr-FR"
+    result = requests.get(url).json()
+    return result["total_results"]
 
 def getRequestToken():
     url = "https://api.themoviedb.org/3/authentication/token/new?api_key="+ API_KEY

@@ -7,7 +7,7 @@ from python_files.Resultat import Resultat
 
 def genere_base_de_donne(idListe: int):
     resultat = []
-    liste = getMoviesFromList(idListe)
+    liste = getAllMoviesFromList(idListe)
 
     for film in liste["items"]:
         if "poster_path" in film:
@@ -24,8 +24,8 @@ def ajout_most_popular_film_to_list(idList: int, idListElimine: int):
     page = 1
     val = 1
 
-    liste_film = getMoviesFromList(idList)
-    liste_film_elimine = getMoviesFromList(idListElimine)
+    liste_film_id = getAllIdFromList(idList)
+    liste_film_elimine_id = getAllIdFromList(idListElimine)
 
     request_token = getRequestToken()
     acceptRequestToken(request_token["request_token"])
@@ -33,10 +33,10 @@ def ajout_most_popular_film_to_list(idList: int, idListElimine: int):
     session = createSession(request_token["request_token"])
 
     liste_id = []
-    for film in liste_film["items"]:
-        liste_id.append(film["id"])
-    for film in liste_film_elimine["items"]:
-        liste_id.append(film["id"])
+    for film in liste_film_id:
+        liste_id.append(film)
+    for film in liste_film_elimine_id:
+        liste_id.append(film)
 
     while (val == 1):
         liste_film_popular = getMostPopularFilms(page)
@@ -55,24 +55,21 @@ def ajout_most_popular_film_to_list(idList: int, idListElimine: int):
 
 
 def ajout_list_in_list(idList1: int, idList2: int, choix: bool):
-    liste_film1 = getMoviesFromList(idList1)
-    liste_film2 = getMoviesFromList(idList2)
-
-    liste_id2 = []
-    for film in liste_film2["items"]:
-        liste_id2.append(film["id"])
+    liste_film1_id = getAllIdFromList(idList1)
+    liste_film2_id = getAllIdFromList(idList2)
 
     request_token = getRequestToken()
     acceptRequestToken(request_token["request_token"])
     input("Wait accept")
     session = createSession(request_token["request_token"])
 
-    for film in liste_film1["items"]:
-        if not(film["id"] in liste_id2):
+    for filmId in liste_film1_id:
+        if not(filmId in liste_film2_id):
             if choix == False:
-                addMovieToList(film["id"], idList2, session["session_id"])
+                addMovieToList(filmId, idList2, session["session_id"])
             else:
-                val = display_one_films(Film(
-                    film["id"], film["title"], film["original_title"], film["poster_path"]), True)
+                film = getFilmInfo(filmId)
+                Film1 = Film(film["id"], film["title"], film["original_title"], film["poster_path"])
+                val = display_one_films(Film1, True)
                 if val == Resultat.BIEN:
-                    addMovieToList(film["id"], idList2, session["session_id"])
+                    addMovieToList(filmId, idList2, session["session_id"])
