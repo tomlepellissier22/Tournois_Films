@@ -40,9 +40,11 @@ def ajout_most_popular_film_to_list(idList: int, idListElimine: int):
 
     while (val == 1):
         liste_film_popular = getMostPopularFilms(page)
+        sawNewFilms = False
 
         for film in liste_film_popular["results"]:
             if not(film["id"] in liste_id):
+                sawNewFilms = True
                 val_film = display_one_films(Film(
                     film["id"], film["title"], film["original_title"], film["poster_path"]), True)
                 if val_film == Resultat.BIEN:
@@ -50,7 +52,8 @@ def ajout_most_popular_film_to_list(idList: int, idListElimine: int):
                 if val_film == Resultat.NUL:
                     addMovieToList(film["id"], idListElimine, session["session_id"])
         
-        val = choix_question("Continuer ?")
+        if (sawNewFilms):
+            val = choix_question("Continuer ?")
         page += 1
 
 

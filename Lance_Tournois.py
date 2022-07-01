@@ -9,7 +9,7 @@ from python_files.Tournois_Films import Tournois_Film
 
 #ajout_most_popular_film_to_list(ID_LISTE_TOUS_LES_FILMS_GASPARD, ID_LISTE_FILMS_ELIMINE_GASPARD)
 
-#ajout_most_popular_film_to_list(ID_LISTE_TOUS_LES_FILMS, ID_LISTE_FILMS_ELIMINE_PERSO)
+ajout_most_popular_film_to_list(ID_LISTE_TOUS_LES_FILMS, ID_LISTE_FILMS_ELIMINE_PERSO)
 
-liste = getAllMoviesFromList(ID_LISTE_TOUS_LES_FILMS)
+liste = getAllIdFromList(ID_LISTE_TOUS_LES_FILMS)
 print(len(liste))
